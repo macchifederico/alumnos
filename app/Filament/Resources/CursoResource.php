@@ -17,8 +17,21 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class CursoResource extends Resource
 {
     protected static ?string $model = Curso::class;
-    // protected static bool $shouldRegisterNavigation = false;
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    // Constantes para tipos de curso
+    public const TIPO_PRESENCIAL = 'Presencial';
+    public const TIPO_VIRTUAL = 'Virtual';
+    public const TIPO_HIBRIDO = 'Híbrido';
+
+    public static function getTiposCurso(): array
+    {
+        return [
+            self::TIPO_PRESENCIAL => 'Presencial',
+            self::TIPO_VIRTUAL => 'Virtual',
+            self::TIPO_HIBRIDO => 'Híbrido',
+        ];
+    }
 
     public static function form(Form $form): Form
     {
@@ -30,32 +43,46 @@ class CursoResource extends Resource
                         Forms\Components\TextInput::make('nombre')
                             ->required()
                             ->maxLength(255)
+                            ->minLength(3)
                             ->label('Nombre del Curso'),
                         Forms\Components\TextInput::make('materia')
                             ->required()
                             ->maxLength(255)
+                            ->minLength(2)
                             ->label('Materia'),
                         Forms\Components\TextInput::make('facultad')
                             ->required()
                             ->maxLength(255)
+                            ->minLength(2)
                             ->label('Facultad'),
-                        Forms\Components\TextInput::make('vigencia')
+                        Forms\Components\DatePicker::make('vigencia')
                             ->required()
-                            ->maxLength(255)
-                            ->label('Vigencia'),
+                            ->label('Vigencia')
+                            ->displayFormat('d/m/Y')
+                            ->format('Y-m-d')
+                            ->native(false)
+                            ->placeholder('dd/mm/aaaa')
+                            ->closeOnDateSelection()
+                            ->locale('es')
+                            ->minDate(now())
+                            ->helperText('La fecha debe ser igual o posterior a hoy'),
                         Forms\Components\TextInput::make('precio')
                             ->required()
+                            ->label('Precio (AR$)')
+                            ->prefix('$')
+                            ->suffix(',00')
                             ->numeric()
-                            ->maxLength(10)
-                            ->label('Precio'),
+                            ->minValue(1)
+                            ->step(0.01)
+                            ->placeholder('25000')
+                            ->helperText('Ingrese el precio sin puntos ni comas (ej: 25000 para $25.000,00)')
+                            ->formatStateUsing(fn ($state) => $state ? number_format($state, 0, ',', '') : '')
+                            ->dehydrateStateUsing(fn ($state) => (float) str_replace(['.', ','], '', $state)),
                         Forms\Components\Select::make('tipo')
-                            ->options([
-                                'presencial' => 'Presencial',
-                                'virtual' => 'Virtual',
-                                'hibrido' => 'Híbrido',
-                            ])
+                            ->options(self::getTiposCurso())
                             ->required()
-                            ->label('Tipo de Curso'),
+                            ->label('Tipo de Curso')
+                            ->placeholder('Seleccione el tipo de curso'),
                     ]),
             ]);
     }
@@ -79,18 +106,43 @@ class CursoResource extends Resource
                 Tables\Columns\TextColumn::make('vigencia')
                     ->sortable()
                     ->searchable()
-                    ->label('Vigencia'),
+                    ->label('Estado')
+                    ->badge()
+                    ->color(fn ($record) => $record->vigencia < now() ? 'danger' : 'success')
+                    ->formatStateUsing(fn ($record) =>
+                        $record->vigencia < now()
+                            ? '🔴 VENCIDO'
+                            : '✅ VIGENTE'
+                    ),
                 Tables\Columns\TextColumn::make('precio')
                     ->sortable()
                     ->searchable()
-                    ->label('Precio'),
+                    ->label('Precio (AR$)')
+                    ->money('ARS', locale: 'es_AR')
+                    ->formatStateUsing(fn ($state) => '$' . number_format($state, 2, ',', '.')),
                 Tables\Columns\TextColumn::make('tipo')
                     ->sortable()
                     ->searchable()
                     ->label('Tipo'),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('estado_vigencia')
+                    ->label('Estado de Vigencia')
+                    ->options([
+                        'vigente' => 'Vigentes',
+                        'vencido' => 'Vencidos',
+                    ])
+                    ->query(function ($query, array $data) {
+                        if ($data['value'] === 'vigente') {
+                            return $query->where('vigencia', '>=', now()->toDateString());
+                        } elseif ($data['value'] === 'vencido') {
+                            return $query->where('vigencia', '<', now()->toDateString());
+                        }
+                        return $query;
+                    }),
+                Tables\Filters\SelectFilter::make('tipo')
+                    ->label('Tipo de Curso')
+                    ->options(self::getTiposCurso()),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

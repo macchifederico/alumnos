@@ -2,7 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\Alumno;
 use App\Models\Curso;
+use App\Models\Domicilio;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -75,5 +77,23 @@ class DatabaseSeeder extends Seeder
             'precio' => 14000,
             'tipo' => 'Presencial'
         ]);
+
+        // Crear alumnos con sus domicilios
+        $alumnos = Alumno::factory(10)->create();
+
+        // Crear domicilios para cada alumno
+        $alumnos->each(function ($alumno) {
+            Domicilio::factory()->create([
+                'id_alumno' => $alumno->id
+            ]);
+        });
+
+        // Asignar cursos aleatorios a algunos alumnos
+        $cursos = Curso::all();
+        $alumnos->each(function ($alumno) use ($cursos) {
+            $alumno->cursos()->attach(
+                $cursos->random(rand(1, 3))->pluck('id')->toArray()
+            );
+        });
     }
 }

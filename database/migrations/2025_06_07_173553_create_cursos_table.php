@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('domicilios', function (Blueprint $table) {
+        Schema::create('cursos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_alumno')->constrained('alumnos')->onDelete('cascade');
-            $table->string('calle');
-            $table->string('numero');
-            $table->string('localidad');
-            $table->string('provincia');
-            $table->string('codigo_postal');
+            $table->string('nombre');
+            $table->string('materia');
+            $table->string('facultad');
+            $table->date('vigencia');
+            $table->decimal('precio', 10, 2);
+            $table->enum('tipo', ['Presencial', 'Virtual', 'Híbrido']);
             $table->timestamps();
         });
     }
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('domicilios');
+        Schema::dropIfExists('cursos');
     }
 };

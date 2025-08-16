@@ -17,12 +17,12 @@ return new class extends Migration
             $table->string('apellido');
             $table->string('dnicuitcuil');
             $table->string('email');
-            $table->date('fecha_nacimiento');
+            $table->string('fecha_nacimiento');
             $table->string('nacionalidad');
             $table->string('telefono');
             $table->timestamps();
-            // $table->foreign('idCurso');
             // $table->foreign('idContactoAuxiliar');
+
         });
     }
 

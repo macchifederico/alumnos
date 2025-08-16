@@ -5,14 +5,18 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\AlumnoResource\Pages;
 use App\Filament\Resources\AlumnoResource\RelationManagers;
 use App\Models\Alumno;
+use App\Models\Curso;
 use Filament\Forms;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Resources\RelationManagers\HasManyRelationManager;
 
 class AlumnoResource extends Resource
 {
@@ -34,22 +38,60 @@ class AlumnoResource extends Resource
                         Forms\Components\TextInput::make('apellido')
                             ->required()
                             ->maxLength(255),
-                        Forms\Components\TextInput::make('Email')
+                        Forms\Components\TextInput::make('email')
                             ->email()
                             ->required()
                             ->maxLength(255),
                         Forms\Components\TextInput::make('telefono')
                             ->tel()
                             ->maxLength(15),
-                        Forms\Components\TextInput::make('dni Cuil Cuit')
+                        Forms\Components\TextInput::make('dnicuitcuil')
+                            ->label('DNI')
                             ->required()
                             ->numeric()
                             ->maxLength(11),
-                        Forms\Components\TextInput::make('telefono')
+                        Forms\Components\TextInput::make('fecha_nacimiento')
                             ->required()
                             ->numeric()
-                            ->maxLength(11),
+                            ->maxLength(8)
+                            ->placeholder('DD-MM-AAAA'),
+                        Forms\Components\TextInput::make('nacionalidad')
+                            ->required()
+                            ->maxLength(255),
                     ]),
+                Section::make('Datos de Domicilio')
+                    ->relationship('domicilio', 'id_alumno')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\TextInput::make('calle')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('numero')
+                            ->required()
+                            ->numeric()
+                            ->maxLength(10),
+                        Forms\Components\TextInput::make('localidad')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('provincia')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('codigo_postal')
+                            ->required()
+                            ->numeric()
+                            ->maxLength(10),
+                    ]),
+                Section::make('Datos de Curso')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\Select::make('cursos')
+                            ->label('Seleccionar Cursos')
+                            ->multiple()
+                            ->options(Curso::all()->pluck('nombre', 'id'))
+                            ->relationship('cursos', 'nombre')
+                            ->preload()
+                            ->searchable(),
+                    ])
             ]);
     }
 
@@ -57,7 +99,15 @@ class AlumnoResource extends Resource
     {
         return $table
             ->columns([
-                //
+                Tables\Columns\TextColumn::make('nombre')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('apellido')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('email')
+                    ->searchable()
+                    ->sortable()
             ])
             ->filters([
                 //
@@ -75,7 +125,7 @@ class AlumnoResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            CursoRelationManager::class,
         ];
     }
 
@@ -86,5 +136,25 @@ class AlumnoResource extends Resource
             'create' => Pages\CreateAlumno::route('/create'),
             'edit' => Pages\EditAlumno::route('/{record}/edit'),
         ];
+    }
+}
+
+class CursoRelationManager extends RelationManager
+{
+    protected static string $relationship = 'cursos';
+    protected static ?string $recordTitleAttribute = 'nombre';
+
+    public function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                Tables\Columns\TextColumn::make('nombre')->label('Nombre'),
+                Tables\Columns\TextColumn::make('materia')->label('Materia'),
+                Tables\Columns\TextColumn::make('facultad')->label('Facultad'),
+                Tables\Columns\TextColumn::make('precio')->label('Precio'),
+            ])
+            ->filters([
+                // Puedes agregar filtros aquí si lo deseas
+            ]);
     }
 }

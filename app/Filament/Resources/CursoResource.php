@@ -145,6 +145,7 @@ class CursoResource extends Resource
                     ->options(self::getTiposCurso()),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
@@ -157,7 +158,7 @@ class CursoResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\ProfesoresRelationManager::class,
         ];
     }
 
@@ -166,6 +167,7 @@ class CursoResource extends Resource
         return [
             'index' => Pages\ListCursos::route('/'),
             'create' => Pages\CreateCurso::route('/create'),
+            'view' => Pages\ViewCurso::route('/{record}'),
             'edit' => Pages\EditCurso::route('/{record}/edit'),
         ];
     }

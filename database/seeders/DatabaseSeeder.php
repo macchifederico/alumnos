@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Alumno;
 use App\Models\Curso;
 use App\Models\Domicilio;
+use App\Models\Profesor;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -18,11 +19,13 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Federico Macchi',
-            'email' => 'federico.macchi@gmail.com',
-            'password' => bcrypt('fedemacchi')
-        ]);
+        User::firstOrCreate(
+            ['email' => 'federico.macchi@gmail.com'],
+            [
+                'name' => 'Federico Macchi',
+                'password' => bcrypt('fedemacchi')
+            ]
+        );
 
         Curso::factory()->create([
             'nombre' => 'Curso de PHP',
@@ -93,6 +96,24 @@ class DatabaseSeeder extends Seeder
         $alumnos->each(function ($alumno) use ($cursos) {
             $alumno->cursos()->attach(
                 $cursos->random(rand(1, 3))->pluck('id')->toArray()
+            );
+        });
+
+        // Crear profesores con sus domicilios
+        $profesores = Profesor::factory(6)->create();
+
+        // Crear domicilios para cada profesor
+        $profesores->each(function ($profesor) {
+            Domicilio::factory()->create([
+                'id_alumno' => null, // Añadiremos una columna id_profesor después
+                'id_profesor' => $profesor->id
+            ]);
+        });
+
+        // Asignar cursos aleatorios a profesores
+        $profesores->each(function ($profesor) use ($cursos) {
+            $profesor->cursos()->attach(
+                $cursos->random(rand(1, 2))->pluck('id')->toArray()
             );
         });
     }

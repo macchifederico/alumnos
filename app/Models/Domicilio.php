@@ -12,16 +12,26 @@ class Domicilio extends Model
 
     protected $fillable = [
         'id_alumno',
+        'id_profesor',
         'calle',
         'numero',
+        'piso',
+        'departamento',
+        'ciudad',
         'localidad',
         'provincia',
         'codigo_postal',
+        'pais',
     ];
 
     public function alumno()
     {
         return $this->belongsTo(Alumno::class, 'id_alumno');
+    }
+
+    public function profesor()
+    {
+        return $this->belongsTo(Profesor::class, 'id_profesor');
     }
 
     // Métodos auxiliares

@@ -29,6 +29,11 @@ class Curso extends Model
         return $this->belongsToMany(Alumno::class, 'alumno_curso', 'curso_id', 'alumno_id');
     }
 
+    public function profesores()
+    {
+        return $this->belongsToMany(Profesor::class, 'profesor_curso', 'id_curso', 'id_profesor');
+    }
+
     // Métodos auxiliares
     public function getCantidadAlumnosAttribute()
     {

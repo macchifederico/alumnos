@@ -26,12 +26,15 @@ class DomicilioFactory extends Factory
     public function definition(): array
     {
         return [
-            'id_alumno' => Alumno::factory(),
             'calle' => $this->faker->streetName(),
             'numero' => $this->faker->buildingNumber(),
+            'piso' => $this->faker->optional()->numberBetween(1, 10),
+            'departamento' => $this->faker->optional()->bothify('?#'),
+            'ciudad' => $this->faker->city(),
             'localidad' => $this->faker->city(),
             'provincia' => $this->faker->state(),
             'codigo_postal' => $this->faker->postcode(),
+            'pais' => 'Argentina',
         ];
     }
 }

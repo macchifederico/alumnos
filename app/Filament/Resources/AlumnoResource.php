@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\AlumnoResource\Pages;
 use App\Filament\Resources\AlumnoResource\RelationManagers;
+use App\Filament\Components\DomicilioForm;
 use App\Models\Alumno;
 use App\Models\Curso;
 use Filament\Forms;
@@ -62,25 +63,7 @@ class AlumnoResource extends Resource
                 Section::make('Datos de Domicilio')
                     ->relationship('domicilio', 'id_alumno')
                     ->columns(2)
-                    ->schema([
-                        Forms\Components\TextInput::make('calle')
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('numero')
-                            ->required()
-                            ->numeric()
-                            ->maxLength(10),
-                        Forms\Components\TextInput::make('localidad')
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('provincia')
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('codigo_postal')
-                            ->required()
-                            ->numeric()
-                            ->maxLength(10),
-                    ]),
+                    ->schema(DomicilioForm::getSchema()),
                 Section::make('Datos de Curso')
                     ->columns(2)
                     ->schema([

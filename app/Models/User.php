@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role_id',
     ];
 
     /**
@@ -44,5 +45,27 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    // Relaciones
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    // Métodos auxiliares
+    public function esAdmin(): bool
+    {
+        return $this->role?->nombre === Role::ADMIN;
+    }
+
+    public function esGestor(): bool
+    {
+        return $this->role?->nombre === Role::GESTOR;
+    }
+
+    public function tienePermiso(string $permiso): bool
+    {
+        return $this->role?->tienePermiso($permiso) ?? false;
     }
 }

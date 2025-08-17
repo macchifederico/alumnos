@@ -51,10 +51,9 @@ class ProfesorResource extends Resource
                         Forms\Components\DatePicker::make('fecha_nacimiento')
                             ->label('Fecha de Nacimiento')
                             ->required()
+                            ->maxDate(now())
                             ->displayFormat('d/m/Y')
-                            ->format('Y-m-d')
-                            ->native(false)
-                            ->locale('es'),
+                            ->native(false),
                         Forms\Components\Select::make('nacionalidad')
                             ->options([
                                 'Argentina' => 'Argentina',

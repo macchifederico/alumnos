@@ -50,11 +50,12 @@ class AlumnoResource extends Resource
                             ->required()
                             ->numeric()
                             ->maxLength(11),
-                        Forms\Components\TextInput::make('fecha_nacimiento')
+                        Forms\Components\DatePicker::make('fecha_nacimiento')
+                            ->label('Fecha de Nacimiento')
                             ->required()
-                            ->numeric()
-                            ->maxLength(8)
-                            ->placeholder('DD-MM-AAAA'),
+                            ->maxDate(now())
+                            ->displayFormat('d/m/Y')
+                            ->native(false),
                         Forms\Components\TextInput::make('nacionalidad')
                             ->required()
                             ->maxLength(255),
@@ -89,19 +90,33 @@ class AlumnoResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable()
-                    ->sortable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('fecha_nacimiento')
+                    ->label('Fecha de Nacimiento')
+                    ->date('d/m/Y')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('dnicuitcuil')
+                    ->label('DNI')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('telefono')
+                    ->label('Teléfono')
+                    ->searchable(),
             ])
             ->filters([
                 //
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->defaultSort('created_at', 'desc');
     }
 
     public static function getRelations(): array

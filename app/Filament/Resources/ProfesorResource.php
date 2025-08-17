@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProfesorResource\Pages;
 use App\Filament\Resources\ProfesorResource\RelationManagers;
-use App\Filament\Components\DomicilioForm;
 use App\Models\Profesor;
 use App\Models\Domicilio;
 use Filament\Forms;
@@ -77,7 +76,7 @@ class ProfesorResource extends Resource
 
                 Forms\Components\Section::make('Domicilio')
                     ->relationship('domicilio')
-                    ->schema(DomicilioForm::getSchema())
+                    ->schema(DomicilioResource::getFormSchema())
                     ->columns(2),
             ]);
     }

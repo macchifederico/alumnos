@@ -50,11 +50,13 @@ class AlumnoResource extends Resource
                             ->required()
                             ->numeric()
                             ->maxLength(11),
-                        Forms\Components\TextInput::make('fecha_nacimiento')
+                        Forms\Components\DatePicker::make('fecha_nacimiento')
+                            ->label('Fecha de Nacimiento')
                             ->required()
-                            ->numeric()
-                            ->maxLength(8)
-                            ->placeholder('DD-MM-AAAA'),
+                            ->displayFormat('d/m/Y')
+                            ->format('Y-m-d')
+                            ->maxDate(now())
+                            ->native(false),
                         Forms\Components\TextInput::make('nacionalidad')
                             ->required()
                             ->maxLength(255),
@@ -89,7 +91,29 @@ class AlumnoResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('dnicuitcuil')
+                    ->label('DNI')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('fecha_nacimiento')
+                    ->label('Fecha de Nacimiento')
+                    ->date('d/m/Y')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('edad')
+                    ->label('Edad')
+                    ->suffix(' años')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('nacionalidad')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('telefono')
+                    ->label('Teléfono')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Creado')
+                    ->dateTime('d/m/Y H:i')
                     ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //

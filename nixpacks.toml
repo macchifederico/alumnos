@@ -7,7 +7,7 @@ cmds = ['docker-php-ext-install intl zip pdo pdo_mysql']
 
 [phases.build]
 cmds = [
-    'composer install --no-dev --optimize-autoloader',
+    'composer install --no-dev --optimize-autoloader --ignore-platform-reqs',
     'php artisan config:cache',
     'php artisan route:cache',
     'php artisan view:cache',
